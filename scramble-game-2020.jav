@@ -1,0 +1,328 @@
+package scrambleHIII;
+
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+public class Scramble implements ActionListener {
+
+	// arraylists
+	private static ArrayList<String> allWords; // all words 4-5 letters in length
+	private static ArrayList<String> scrambledWords; // The questions after scrambling
+	private static ArrayList<String> unscrambledWords; // The answers
+
+	// important numbers
+	private int scoreNumber = 0;
+	private int problemNumber = 1;
+	private static int toWinScore = 7;
+
+	// display base stuff
+	private static JFrame frame;
+	private static JPanel panel;
+	private static Rectangle rect;
+
+	// display front page stuff
+	private static JLabel title = new JLabel("ESCAPE");
+	private static JLabel beginningDirectionsLabel1 = new JLabel("You go on a submarine ride to look at wild life. "
+			+ "All is well until your fuel meter marks an empty tank.");
+
+	private static JLabel beginningDirectionsLabel2 = new JLabel(
+			"As you attempt to escape your sinking subamrine to avoid death, " + "you need to grab your dive suit.");
+
+	private static JLabel beginningDirectionsLabel3 = new JLabel(
+			"Your dive suit will allow you to breathe underwater until you reach "
+					+ "the mermaids in Atlantis for help.");
+
+	private static JLabel beginningDirectionsLabel4 = new JLabel(
+			"Unfortunately, to get your dive suit, you need to input 12 passwords! While you have a sheet of paper");
+
+	private static JLabel beginningDirectionsLabel5 = new JLabel(
+			"with you, they are all scrambled for privacy reasons. You must unscramble these words to get the passwords.");
+
+	private static JLabel beginningDirectionsLabel6 = new JLabel(
+			"If you get at least " + toWinScore + " correct, you will be granted acccess to your dive suit.");
+
+	// buttons 
+	private static JButton startGameButton = new JButton("START GAME");; // literally start game
+	private static JButton submitButton = new JButton("SUBMIT PASSWORD"); // submit your answer to the question/ submit your password
+	private static JButton escapeButton = new JButton("ESCAPE SUBMARINE"); // escape the submarine with dive suit and go to mermaids. should take to next
+	
+	// graphics to display during game control
+	private static JLabel scoreLabel = new JLabel(""); // tells if you got right or wrong
+	private static JLabel problemLabel = new JLabel("Unscramble this word: "); // asks you the actual question with the
+																				// scrambled word
+	private static JLabel scoreNumberLabel = new JLabel("Your Score: "); // displays the number correct you got
+	private static JLabel problemNumberLabel = new JLabel("Problem Number: "); // displays which questions you're on
+	private static JTextField textbox = new JTextField(); // area where user can input their answer
+	
+	//end of game controls
+	private static JLabel didEscape1 = new JLabel(""); // tells you if you failed of suceeded
+	private static JLabel didEscape2 = new JLabel(""); // tells you if you failed of suceeded
+	private static JButton nextButton = new JButton("NEXT"); // proceed onto next game
+	private static JButton restartButton = new JButton("RESTART"); //restart entire game
+	
+
+	public static void main(String[] args) throws InterruptedException, FileNotFoundException {
+		Scramble scramble = new Scramble();
+
+		scramble.initPanels();
+		scramble.startScramble();
+	}
+
+	// Create questions and answers list(scrambled/ unscrambled)
+	public static void startScramble() throws InterruptedException, FileNotFoundException {
+
+		Scanner input = new Scanner(new File("wordsList.txt"));
+		allWords = new ArrayList<String>();
+		scrambledWords = new ArrayList<String>();
+		unscrambledWords = new ArrayList<String>();
+
+		// Make ArrayList of all words
+		while (input.hasNextLine()) {
+			String word = input.nextLine();
+			if (word.length() <= 5 && word.length() > 3) {
+				allWords.add(word);
+			}
+		}
+
+		// Make ArrayList of words used in game; will also be the answers
+		int count = 0;
+		while (count < 12) {
+			int r = (int) (Math.random() * allWords.size());
+			String word = allWords.get(r);
+
+			if (canAddWord(word)) {
+				unscrambledWords.add(word);
+				count++;
+				// System.out.println(word);
+			}
+		}
+		System.out.println();
+
+		// Make ArrayList of scrambled word used in game; will also be the questions
+		for (int i = 0; i < unscrambledWords.size(); i++) {
+			String scrambledWord = scramble(unscrambledWords.get(i));
+			scrambledWords.add(scrambledWord);
+			// System.out.println(scrambled);
+		}
+
+	}
+
+	public static boolean canAddWord(String word) {
+		for (int j = 0; j < scrambledWords.size(); j++) {
+			if (word == scrambledWords.get(j)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static String scramble(String word) {
+		String scrambled = "";
+		ArrayList<Character> letters = new ArrayList<Character>();
+
+		// make array of letters
+		for (int i = 0; i < word.length(); i++) {
+			char letter = word.charAt(i);
+			letters.add(letter);
+		} // use letters in rand order
+		while (scrambled.length() != word.length()) {
+			int r = (int) (Math.random() * letters.size());
+			scrambled += letters.get(r);
+			letters.remove(r);
+		}
+
+		return scrambled;
+	}
+
+	// During game controls display
+	public void initPanels() {
+
+		frame = new JFrame();
+		rect = new Rectangle(800, 400);
+		frame.setBounds(rect);
+		panel = new JPanel();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.add(panel);
+		panel.setLayout(null);
+
+		// add in directions
+		title.setBounds(10, 25, 650, 25);
+		panel.add(title);
+		
+		beginningDirectionsLabel1.setBounds(10, 50, 650, 25);
+		panel.add(beginningDirectionsLabel1);
+
+		beginningDirectionsLabel2.setBounds(10, 70, 650, 25);
+		panel.add(beginningDirectionsLabel2);
+
+		beginningDirectionsLabel3.setBounds(10, 90, 650, 25);
+		panel.add(beginningDirectionsLabel3);
+
+		beginningDirectionsLabel4.setBounds(10, 110, 700, 25);
+		panel.add(beginningDirectionsLabel4);
+
+		beginningDirectionsLabel5.setBounds(10, 130, 700, 25);
+		panel.add(beginningDirectionsLabel5);
+
+		beginningDirectionsLabel6.setBounds(10, 150, 550, 25);
+		panel.add(beginningDirectionsLabel6);
+
+		startGameButton.setBounds(10, 180, 150, 25);
+		startGameButton.addActionListener(new Scramble());
+		panel.add(startGameButton);
+
+		// after START GAME button clicked
+		scoreNumberLabel.setBounds(10, 20, 140, 25);
+		panel.add(scoreNumberLabel);
+		scoreNumberLabel.hide();
+
+		problemNumberLabel.setBounds(150, 20, 300, 25);
+		panel.add(problemNumberLabel);
+		problemNumberLabel.hide();
+		
+		scoreLabel.setBounds(10, 65, 550, 25);
+		panel.add(scoreLabel);
+		scoreLabel.hide();
+		
+		problemLabel.setBounds(10, 115, 290, 25);
+		panel.add(problemLabel);
+		problemLabel.hide();
+
+		textbox.setBounds(10, 135, 300, 25);
+		panel.add(textbox);
+		textbox.hide();
+
+		submitButton.setBounds(350, 135, 150, 25);
+		submitButton.addActionListener(new Scramble());
+		panel.add(submitButton);
+		submitButton.hide();
+		
+		//END of game controls
+		escapeButton.setBounds(350, 135, 150, 25);
+		escapeButton.addActionListener(new Scramble());
+		panel.add(escapeButton);
+		escapeButton.hide();
+		
+		didEscape1.setBounds(10, 25, 500, 100);
+		panel.add(didEscape1);
+		didEscape1.hide();
+		
+		didEscape2.setBounds(10, 80, 500, 25);
+		panel.add(didEscape2);
+		didEscape2.hide();
+
+		nextButton.setBounds(10, 135, 150, 25);
+		nextButton.addActionListener(new Scramble());
+		panel.add(nextButton);
+		nextButton.hide();
+
+		restartButton.setBounds(10, 135, 150, 25);
+		restartButton.addActionListener(new Scramble());
+		panel.add(restartButton);
+		restartButton.hide();
+
+		frame.setVisible(true);
+
+	}
+
+	public void actionPerformed(ActionEvent e) {
+
+		if (e.getSource() == startGameButton) {
+
+			// remove preexisting items
+			title.hide();
+			beginningDirectionsLabel1.hide();
+			beginningDirectionsLabel2.hide();
+			beginningDirectionsLabel3.hide();
+			beginningDirectionsLabel4.hide();
+			beginningDirectionsLabel5.hide();
+
+			beginningDirectionsLabel6.setBounds(10, 85, 550, 25);
+			panel.add(beginningDirectionsLabel6);
+
+			startGameButton.hide();
+
+			problemsDisplay(false);
+
+		} else if ((e.getSource() == submitButton)) {
+
+			if (isCorrect()) {
+				scoreLabel.setText("Correct! Good Job!");
+
+				scoreNumber++;
+				problemNumber++;
+
+			} else {
+				scoreLabel.setText("Incorrect! The correct anwser is " + unscrambledWords.get(problemNumber - 1));
+
+				problemNumber++;
+
+			}
+
+			if (problemNumber - 1 == 10) {
+				problemsDisplay(true);
+			} else {
+				problemsDisplay(false);
+			}
+		
+		} else {
+			beginningDirectionsLabel6.hide();
+			scoreNumberLabel.hide();
+			problemNumberLabel.hide();
+			problemLabel.hide();
+			textbox.hide();
+			scoreLabel.hide();
+			escapeButton.hide();
+			
+			didEscape1.show();
+			didEscape2.show();
+			
+			if(scoreNumber >= toWinScore) {
+				didEscape1.setText("Congrats! You escaped the submarine sucessfully with the dive suit!");
+				didEscape2.setText("Click \"Next\" to proceed in the game.");
+				nextButton.show();
+			} else {
+				didEscape1.setText("Sorry! You were not able to successfully escape the submarine with the dive suit.");
+				didEscape2.setText("Click \"Restart\" to restart the game.");
+				restartButton.show();
+			}
+		}
+	}
+
+	public void problemsDisplay(boolean isLastProblem) {
+
+		scoreNumberLabel.show();
+		problemNumberLabel.show();
+		problemLabel.show();
+		textbox.show();
+		submitButton.show();
+		scoreLabel.show();
+
+		scoreNumberLabel.setText("Your Score: " + scoreNumber);
+		problemNumberLabel.setText("Problem Number: " + problemNumber);
+
+		problemLabel.setText("Unscramble this word: " + scrambledWords.get(problemNumber - 1));
+		
+		if(isLastProblem) {
+			submitButton.hide();
+			escapeButton.show();
+		}
+
+	}
+
+	public boolean isCorrect() {
+		String userAnswer = textbox.getText();
+		return userAnswer.equals(unscrambledWords.get(problemNumber - 1));
+	}
+}
