@@ -1,4 +1,4 @@
-package scrambleHIII;
+package scramble-game-2020;
 
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
